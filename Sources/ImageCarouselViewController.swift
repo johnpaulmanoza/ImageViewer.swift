@@ -13,6 +13,7 @@ public class ImageCarouselViewController:UIPageViewController {
     var theme:ImageViewerTheme = .light {
         didSet {
             navItem.leftBarButtonItem?.tintColor = theme.tintColor
+            navItem.rightBarButtonItem?.tintColor = theme.tintColor
             backgroundView.backgroundColor = theme.color
         }
     }
@@ -20,12 +21,14 @@ public class ImageCarouselViewController:UIPageViewController {
     var options:[ImageViewerOption] = []
     
     weak var rightNavItemDelegate:RightNavItemDelegate?
+    weak var middleNavItemDelegate:MiddleNavItemDelegate?
     
     private(set) lazy var navBar:UINavigationBar = {
         let _navBar = UINavigationBar(frame: .zero)
         _navBar.isTranslucent = true
         _navBar.setBackgroundImage(UIImage(), for: .default)
         _navBar.shadowImage = UIImage()
+        _navBar.tintColor = theme.color
         return _navBar
     }()
     
@@ -72,6 +75,7 @@ public class ImageCarouselViewController:UIPageViewController {
         
         navItem.leftBarButtonItem = closeBarButton
         navItem.leftBarButtonItem?.tintColor = theme.tintColor
+        navItem.rightBarButtonItems = []
         navBar.alpha = 0.0
         navBar.items = [navItem]
         navBar.insert(to: view)
@@ -87,24 +91,42 @@ public class ImageCarouselViewController:UIPageViewController {
         
         options.forEach {
             switch $0 {
-                case .theme(let theme):
-                    self.theme = theme
-                case .closeIcon(let icon):
-                    navItem.leftBarButtonItem?.image = icon
-                case .rightNavItemTitle(let title, let delegate):
-                    navItem.rightBarButtonItem = UIBarButtonItem(
-                        title: title,
-                        style: .plain,
-                        target: self,
-                        action: #selector(diTapRightNavBarItem(_:)))
-                    rightNavItemDelegate = delegate
-                case .rightNavItemIcon(let icon, let delegate):
-                    navItem.rightBarButtonItem = UIBarButtonItem(
+            case .theme(let theme):
+                self.theme = theme
+            case .closeIcon(let icon):
+                navItem.leftBarButtonItem?.image = icon
+            case .middleNavItemTitle(let title, let icon, let delegate1, let delegate2):
+                navItem.rightBarButtonItems = [
+                    UIBarButtonItem(
                         image: icon,
                         style: .plain,
                         target: self,
-                        action: #selector(diTapRightNavBarItem(_:)))
-                    rightNavItemDelegate = delegate
+                        action: #selector(diTapRightNavBarItem(_:))
+                    ),
+                    UIBarButtonItem(
+                        title: title,
+                        style: .done,
+                        target: self,
+                        action: #selector(diTapMiddleNavBarItem(_:))
+                    )
+                ]
+                middleNavItemDelegate = delegate1; rightNavItemDelegate = delegate2
+            case .rightNavItemTitle(let title, let delegate):
+                navItem.rightBarButtonItems!.append(UIBarButtonItem(
+                    title: title,
+                    style: .plain,
+                    target: self,
+                    action: #selector(diTapRightNavBarItem(_:))))
+                rightNavItemDelegate = delegate
+            case .rightNavItemIcon(let icon, let delegate):
+                navItem.rightBarButtonItems!.append(UIBarButtonItem(
+                    image: icon,
+                    style: .plain,
+                    target: self,
+                    action: #selector(diTapRightNavBarItem(_:))))
+                rightNavItemDelegate = delegate
+            default:
+                break
             }
         }
     }
@@ -159,6 +181,14 @@ public class ImageCarouselViewController:UIPageViewController {
             let _firstVC = viewControllers?.first as? ImageViewerController
             else { return }
         _delegate.imageViewer(self, didTapRightNavItem: _firstVC.index)
+    }
+    
+    @objc
+    func diTapMiddleNavBarItem(_ sender:UIBarButtonItem) {
+        guard let _delegate = middleNavItemDelegate,
+            let _firstVC = viewControllers?.first as? ImageViewerController
+            else { return }
+        _delegate.imageViewer(self, didTapMiddleNavItem: _firstVC.index)
     }
     
     override public var preferredStatusBarStyle: UIStatusBarStyle {

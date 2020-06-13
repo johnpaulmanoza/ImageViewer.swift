@@ -21,7 +21,7 @@ public class ImageCarouselViewController:UIPageViewController {
     var options:[ImageViewerOption] = []
     
     weak var rightNavItemDelegate:RightNavItemDelegate?
-    weak var middleNavItemDelegate:MiddleNavItemDelegate?
+    weak var actionNavItemDelegate:NavItemDelegate?
     
     private(set) lazy var navBar:UINavigationBar = {
         let _navBar = UINavigationBar(frame: .zero)
@@ -95,22 +95,29 @@ public class ImageCarouselViewController:UIPageViewController {
                 self.theme = theme
             case .closeIcon(let icon):
                 navItem.leftBarButtonItem?.image = icon
-            case .middleNavItemTitle(let title, let icon, let delegate1, let delegate2):
+            case .actionNavItemTitle(let title, let closeIcon, let moreIcon, let delegate):
+                navItem.leftBarButtonItem?.image = closeIcon
                 navItem.rightBarButtonItems = [
                     UIBarButtonItem(
-                        image: icon,
+                        image: moreIcon,
                         style: .plain,
                         target: self,
-                        action: #selector(diTapRightNavBarItem(_:))
+                        action: #selector(didTapMoreNavBarItem(_:))
                     ),
                     UIBarButtonItem(
-                        title: title,
-                        style: .done,
+                        title: "Share",
+                        style: .plain,
                         target: self,
-                        action: #selector(diTapMiddleNavBarItem(_:))
+                        action: #selector(didTapShareNavBarItem(_:))
+                    ),
+                    UIBarButtonItem(
+                        title: "Edit",
+                        style: .plain,
+                        target: self,
+                        action: #selector(didTapEditNavBarItem(_:))
                     )
                 ]
-                middleNavItemDelegate = delegate1; rightNavItemDelegate = delegate2
+                actionNavItemDelegate = delegate
             case .rightNavItemTitle(let title, let delegate):
                 navItem.rightBarButtonItems!.append(UIBarButtonItem(
                     title: title,
@@ -184,11 +191,27 @@ public class ImageCarouselViewController:UIPageViewController {
     }
     
     @objc
-    func diTapMiddleNavBarItem(_ sender:UIBarButtonItem) {
-        guard let _delegate = middleNavItemDelegate,
+    func didTapEditNavBarItem(_ sender:UIBarButtonItem) {
+        guard let _delegate = actionNavItemDelegate,
             let _firstVC = viewControllers?.first as? ImageViewerController
             else { return }
-        _delegate.imageViewer(self, didTapMiddleNavItem: _firstVC.index)
+        _delegate.imageViewer(self, didTapEditNavItem: _firstVC.index)
+    }
+    
+    @objc
+    func didTapMoreNavBarItem(_ sender:UIBarButtonItem) {
+        guard let _delegate = actionNavItemDelegate,
+            let _firstVC = viewControllers?.first as? ImageViewerController
+            else { return }
+        _delegate.imageViewer(self, didTapMoreNavItem: _firstVC.index)
+    }
+    
+    @objc
+    func didTapShareNavBarItem(_ sender:UIBarButtonItem) {
+        guard let _delegate = actionNavItemDelegate,
+            let _firstVC = viewControllers?.first as? ImageViewerController
+            else { return }
+        _delegate.imageViewer(self, didTapShareNavItem: _firstVC.index)
     }
     
     override public var preferredStatusBarStyle: UIStatusBarStyle {

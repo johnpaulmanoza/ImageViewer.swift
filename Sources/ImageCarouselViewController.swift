@@ -95,8 +95,13 @@ public class ImageCarouselViewController:UIPageViewController {
                 self.theme = theme
             case .closeIcon(let icon):
                 navItem.leftBarButtonItem?.image = icon
-            case .actionNavItemTitle(let closeIcon, let moreIcon, let delegate):
-                navItem.leftBarButtonItem?.image = closeIcon
+            case .actionNavItemTitle(let moreIcon, let delegate):
+                navItem.leftBarButtonItem = UIBarButtonItem(
+                    title: "Edit",
+                    style: .plain,
+                    target: self,
+                    action: #selector(didTapEditNavBarItem(_:))
+                )
                 navItem.rightBarButtonItems = [
                     UIBarButtonItem(
                         image: moreIcon,
@@ -105,16 +110,10 @@ public class ImageCarouselViewController:UIPageViewController {
                         action: #selector(didTapMoreNavBarItem(_:))
                     ),
                     UIBarButtonItem(
-                        title: "Share",
+                        title: "Post",
                         style: .plain,
                         target: self,
                         action: #selector(didTapShareNavBarItem(_:))
-                    ),
-                    UIBarButtonItem(
-                        title: "Edit",
-                        style: .plain,
-                        target: self,
-                        action: #selector(didTapEditNavBarItem(_:))
                     )
                 ]
                 actionNavItemDelegate = delegate

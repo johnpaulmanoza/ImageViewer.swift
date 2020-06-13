@@ -95,7 +95,7 @@ public class ImageCarouselViewController:UIPageViewController {
                 self.theme = theme
             case .closeIcon(let icon):
                 navItem.leftBarButtonItem?.image = icon
-            case .actionNavItemTitle(let title, let closeIcon, let moreIcon, let delegate):
+            case .actionNavItemTitle(let closeIcon, let moreIcon, let delegate):
                 navItem.leftBarButtonItem?.image = closeIcon
                 navItem.rightBarButtonItems = [
                     UIBarButtonItem(

@@ -95,13 +95,21 @@ public class ImageCarouselViewController:UIPageViewController {
                 self.theme = theme
             case .closeIcon(let icon):
                 navItem.leftBarButtonItem?.image = icon
-            case .actionNavItemTitle(let moreIcon, let delegate):
-                navItem.leftBarButtonItem = UIBarButtonItem(
-                    title: "Edit",
-                    style: .plain,
-                    target: self,
-                    action: #selector(didTapEditNavBarItem(_:))
-                )
+            case .actionNavItemTitle(let closeIcon, let moreIcon, let delegate):
+                navItem.leftBarButtonItems = [
+                    UIBarButtonItem(
+                        image: closeIcon,
+                        style: .plain,
+                        target: self,
+                        action: #selector(dismiss(_:))
+                    ),
+                    UIBarButtonItem(
+                        title: "Edit",
+                        style: .plain,
+                        target: self,
+                        action: #selector(didTapEditNavBarItem(_:))
+                    )
+                ]
                 navItem.rightBarButtonItems = [
                     UIBarButtonItem(
                         image: moreIcon,
@@ -122,14 +130,14 @@ public class ImageCarouselViewController:UIPageViewController {
                     title: title,
                     style: .plain,
                     target: self,
-                    action: #selector(diTapRightNavBarItem(_:))))
+                    action: #selector(didTapRightNavBarItem(_:))))
                 rightNavItemDelegate = delegate
             case .rightNavItemIcon(let icon, let delegate):
                 navItem.rightBarButtonItems!.append(UIBarButtonItem(
                     image: icon,
                     style: .plain,
                     target: self,
-                    action: #selector(diTapRightNavBarItem(_:))))
+                    action: #selector(didTapRightNavBarItem(_:))))
                 rightNavItemDelegate = delegate
             default:
                 break
@@ -182,7 +190,7 @@ public class ImageCarouselViewController:UIPageViewController {
     }
     
     @objc
-    func diTapRightNavBarItem(_ sender:UIBarButtonItem) {
+    func didTapRightNavBarItem(_ sender:UIBarButtonItem) {
         guard let _delegate = rightNavItemDelegate,
             let _firstVC = viewControllers?.first as? ImageViewerController
             else { return }
